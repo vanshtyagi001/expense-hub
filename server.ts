@@ -1,9 +1,8 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { requireAuth, AuthRequest } from './src/middleware/auth.ts';
-import { db } from './src/db/index.ts';
-import { users } from './src/db/schema.ts';
+import { requireAuth } from './src/middleware/auth.ts';
+import groupsRouter from './src/api/groups/index.ts';
 
 async function startServer() {
   const app = express();
@@ -15,6 +14,8 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
+
+  app.use("/api/groups", groupsRouter);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
