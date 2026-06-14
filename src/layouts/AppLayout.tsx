@@ -17,15 +17,15 @@ export function AppLayout() {
     <div className="min-h-screen bg-[#f7f7f7] flex flex-col md:flex-row font-sans pb-[72px] md:pb-0">
       {/* Desktop Sidebar */}
       <aside className="hidden w-full md:w-64 bg-black text-white p-6 md:flex flex-col md:min-h-screen shrink-0">
-        <div className="flex items-center gap-2 mb-10">
+        <div className="flex items-center gap-3 mb-10">
           <div className="w-8 h-8 flex items-center justify-center">
             <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-md" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">ExpenseHub</span>
+          <span className="text-xl font-medium tracking-tight text-white">ExpenseHub</span>
         </div>
 
         <nav className="flex flex-col gap-2 flex-grow">
-          <Link to="/" className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive('/') ? 'bg-white/20 opacity-100' : 'hover:bg-white/10 opacity-80 hover:opacity-100'}`}>
+          <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive('/dashboard') ? 'bg-white/20 opacity-100' : 'hover:bg-white/10 opacity-80 hover:opacity-100'}`}>
             <LayoutDashboard size={20} />
             <span>Dashboard</span>
           </Link>
@@ -47,11 +47,11 @@ export function AppLayout() {
 
       {/* Mobile Header */}
       <header className="md:hidden flex items-center justify-between px-4 h-16 bg-white border-b border-gray-100 shrink-0 sticky top-0 z-10 top-safe-area">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="w-8 h-8 flex items-center justify-center">
              <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-md" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-black">ExpenseHub</span>
+          <span className="text-xl font-medium tracking-tight text-black">ExpenseHub</span>
         </div>
         <Button variant="ghost" size="icon" onClick={logout} className="text-gray-500 rounded-full">
           <LogOut size={20} />
@@ -67,9 +67,9 @@ export function AppLayout() {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-white border-t border-[#e5e5e5] flex items-center justify-around px-2 pb-safe z-50">
-        <Link to="/" className="flex flex-col items-center justify-center w-full h-full gap-1">
-          <LayoutDashboard size={22} className={isActive('/') ? 'text-black' : 'text-gray-400'} />
-          <span className={`text-[11px] font-medium ${isActive('/') ? 'text-black' : 'text-gray-400'}`}>Home</span>
+        <Link to="/dashboard" className="flex flex-col items-center justify-center w-full h-full gap-1">
+          <LayoutDashboard size={22} className={isActive('/dashboard') ? 'text-black' : 'text-gray-400'} />
+          <span className={`text-[11px] font-medium ${isActive('/dashboard') ? 'text-black' : 'text-gray-400'}`}>Home</span>
         </Link>
         <Link to="/groups" className="flex flex-col items-center justify-center w-full h-full gap-1">
           <Users size={22} className={isActive('/groups') ? 'text-black' : 'text-gray-400'} />

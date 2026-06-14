@@ -10,7 +10,7 @@ export default function AuthCallback() {
           window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
           window.close();
         } else {
-          window.location.href = '/';
+          window.location.href = '/dashboard';
         }
       }
     });
@@ -22,7 +22,7 @@ export default function AuthCallback() {
           window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
           window.close();
         } else {
-          window.location.href = '/';
+          window.location.href = '/dashboard';
         }
       } else if (!window.opener) {
         // If not a popup and no session yet, Supabase might just be exchanging code.

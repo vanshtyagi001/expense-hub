@@ -26,12 +26,12 @@ export default function Register() {
              const { data: { session }, error } = await supabase.auth.getSession();
              if (error) throw error;
              if (session) {
-               navigate('/');
+               navigate('/dashboard');
              } else {
                // Fallback: try one more time
                setTimeout(async () => {
                  const { data } = await supabase.auth.getSession();
-                 if (data.session) navigate('/');
+                 if (data.session) navigate('/dashboard');
                }, 1000);
              }
           }, 300);
@@ -64,7 +64,7 @@ export default function Register() {
       if (data.user && !data.session) {
         setSuccessMsg('A confirmation email has been sent. Please check your inbox.');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (err: any) {
       if (err.message?.toLowerCase().includes('rate limit')) {
