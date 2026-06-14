@@ -15,8 +15,8 @@ export function AppLayout() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-black text-white p-6 flex flex-col md:min-h-screen shrink-0">
         <div className="flex items-center gap-2 mb-10">
-          <div className="w-8 h-8 rounded-full bg-[#00e013] flex items-center justify-center font-bold text-black font-mono">
-            EH
+          <div className="w-8 h-8 flex items-center justify-center">
+            <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-md" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">ExpenseHub</span>
         </div>

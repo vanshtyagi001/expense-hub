@@ -87,8 +87,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#00e013] p-4 text-black font-sans">
       <Card className="w-full max-w-md border-0 shadow-2xl rounded-[32px] overflow-hidden bg-white">
         <CardHeader className="space-y-1 pb-8 pt-10 text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-black flex items-center justify-center mb-4">
-             <span className="text-[#00e013] font-bold font-mono text-xl">EH</span>
+          <div className="mx-auto w-16 h-16 flex items-center justify-center mb-4">
+             <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-2xl shadow-sm" />
           </div>
           <CardTitle className="text-3xl font-normal tracking-tight">Welcome back</CardTitle>
           <CardDescription className="text-black/60">
