@@ -108,3 +108,19 @@ export const groupsRelations = relations(groups, ({ many }) => ({
   settlements: many(settlements),
   importSessions: many(importSessions),
 }));
+
+export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
+  group: one(groups, { fields: [groupMembers.groupId], references: [groups.id] }),
+  user: one(users, { fields: [groupMembers.userId], references: [users.id] }),
+}));
+
+export const expensesRelations = relations(expenses, ({ one, many }) => ({
+  group: one(groups, { fields: [expenses.groupId], references: [groups.id] }),
+  paidBy: one(users, { fields: [expenses.paidById], references: [users.id] }),
+  splits: many(expenseSplits),
+}));
+
+export const expenseSplitsRelations = relations(expenseSplits, ({ one }) => ({
+  expense: one(expenses, { fields: [expenseSplits.expenseId], references: [expenses.id] }),
+  user: one(users, { fields: [expenseSplits.userId], references: [users.id] }),
+}));

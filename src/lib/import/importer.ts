@@ -23,7 +23,7 @@ export async function processCsvUpload(csvContent: string, groupId: string, file
     if (!validation.success) {
       processedRows.push({
         rawRow: raw,
-        errors: validation.error.errors.map(e => e.message),
+        errors: ((validation as any).error?.errors || []).map((e: any) => e.message),
         anomalies: [{ anomalyType: 'MISSING_REQUIRED_FIELD', severity: 'ERROR', description: 'Failed to validate row structure' }]
       });
     } else {

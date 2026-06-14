@@ -43,7 +43,8 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
         }
 
         // Each split participant is debited
-        for (const split of exp.splits) {
+        const splits = (exp.splits as any[]) || [];
+        for (const split of splits) {
             if (balances.has(split.userId)) {
                  balances.set(split.userId, balances.get(split.userId)!.minus(new Decimal(split.amount)));
             }
@@ -63,10 +64,11 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
 
     const memberBalances = members.map(m => {
         const net = balances.get(m.userId)!.toNumber();
+        const user = m.user as any;
         return {
             userId: m.userId,
-            name: m.user.name,
-            email: m.user.email,
+            name: user?.name,
+            email: user?.email,
             netBalance: net
         };
     });
@@ -75,8 +77,8 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
     
     // enhance settlement plan with names
     const planWithNames = settlementPlan.map(sp => {
-        const fromUser = members.find(m => m.userId === sp.fromUserId)?.user;
-        const toUser = members.find(m => m.userId === sp.toUserId)?.user;
+        const fromUser = members.find(m => m.userId === sp.fromUserId)?.user as any;
+        const toUser = members.find(m => m.userId === sp.toUserId)?.user as any;
         return {
             ...sp,
             fromName: fromUser?.name || 'Unknown',

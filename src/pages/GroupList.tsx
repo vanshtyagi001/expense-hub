@@ -39,7 +39,7 @@ export default function GroupList() {
     }
   };
 
-  const handleCreateGroup = async (e: React.FormEvent) => {
+  const handleCreateGroup = async (e: import('react').FormEvent) => {
     e.preventDefault();
     if (!token) return;
     setCreating(true);
@@ -81,10 +81,8 @@ export default function GroupList() {
         </div>
         
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="rounded-full bg-[#00e013] text-black hover:bg-[#00e013]/90 gap-2 h-12 px-6 shadow-sm">
-              <Plus size={18} /> New Group
-            </Button>
+          <DialogTrigger render={<Button className="rounded-full bg-[#00e013] text-black hover:bg-[#00e013]/90 gap-2 h-12 px-6 shadow-sm" />}>
+            <Plus size={18} /> New Group
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] rounded-[32px] p-6 border-0 shadow-2xl">
             <DialogHeader>

@@ -24,8 +24,8 @@ router.post('/', requireAuth, upload.single('file'), async (req: AuthRequest, re
       where: eq(groupMembers.groupId, groupId),
       with: { user: true }
     });
-    const memberEmails = membersList.map(m => m.user.email);
-    const memberNames = membersList.map(m => m.user.name);
+    const memberEmails = membersList.map(m => (m.user as any)?.email);
+    const memberNames = membersList.map(m => (m.user as any)?.name);
 
     const result = await processCsvUpload(csvContent, groupId, file.originalname, {
       today,

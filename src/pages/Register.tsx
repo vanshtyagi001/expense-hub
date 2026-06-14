@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -15,17 +14,23 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: import('react').FormEvent) => {
     e.preventDefault();
     try {
       setError('');
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Update profile with name
-      await updateProfile(userCredential.user, { displayName: name });
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          }
+        }
+      });
+      if (signUpError) throw signUpError;
       
-      // We will also send a request to /api/auth/register later or sync with DB here,
-      // but for now Firebase auth creation is enough to trigger frontend navigation
+      // We will also send a request to /api/auth/register later or sync with DB here
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to create an account');

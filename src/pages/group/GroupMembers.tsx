@@ -33,7 +33,7 @@ export default function GroupMembers() {
      fetchMembers();
   }, [token, groupId]);
 
-  const handleAddMember = async (e: React.FormEvent) => {
+  const handleAddMember = async (e: import('react').FormEvent) => {
       e.preventDefault();
       setAdding(true);
       setError('');
@@ -67,10 +67,8 @@ export default function GroupMembers() {
            <h2 className="text-2xl font-normal tracking-tight">Members</h2>
            
            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-               <DialogTrigger asChild>
-                   <Button className="rounded-full bg-[#00e013] text-black hover:bg-[#00e013]/90 gap-2 h-10 px-6 shadow-sm">
-                       <Plus size={16} /> Add Member
-                   </Button>
+               <DialogTrigger render={<Button className="rounded-full bg-[#00e013] text-black hover:bg-[#00e013]/90 gap-2 h-10 px-6 shadow-sm" />}>
+                   <Plus size={16} /> Add Member
                </DialogTrigger>
                <DialogContent className="sm:max-w-[425px] rounded-[32px] p-6 border-0 shadow-2xl">
                    <DialogHeader>
