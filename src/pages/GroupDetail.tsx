@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
+import { useParams, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useAuth } from '../contexts/AuthContext';
 import { LoaderCircle } from 'lucide-react';
 import GroupImport from './GroupImport';
+import GroupOverview from './group/GroupOverview';
+import GroupExpenses from './group/GroupExpenses';
+import GroupBalances from './group/GroupBalances';
+import GroupMembers from './group/GroupMembers';
 
 export default function GroupDetail() {
   const { groupId } = useParams<{ groupId: string }>();
@@ -13,7 +17,6 @@ export default function GroupDetail() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Determine current tab from URL path
   const currentTab = location.pathname.split('/').pop() === groupId ? 'overview' : location.pathname.split('/').pop();
 
   useEffect(() => {
@@ -66,10 +69,10 @@ export default function GroupDetail() {
         
         <div className="mt-4">
           <Routes>
-            <Route index element={<div className="bg-white p-8 rounded-[32px] shadow-sm">Overview Content coming soon...</div>} />
-            <Route path="expenses" element={<div className="bg-white p-8 rounded-[32px] shadow-sm">Expenses Content coming soon...</div>} />
-            <Route path="balances" element={<div className="bg-white p-8 rounded-[32px] shadow-sm">Balances Content coming soon...</div>} />
-            <Route path="members" element={<div className="bg-white p-8 rounded-[32px] shadow-sm">Members Content coming soon...</div>} />
+            <Route index element={<GroupOverview />} />
+            <Route path="expenses" element={<GroupExpenses />} />
+            <Route path="balances" element={<GroupBalances />} />
+            <Route path="members" element={<GroupMembers />} />
             <Route path="import/*" element={<GroupImport />} />
           </Routes>
         </div>

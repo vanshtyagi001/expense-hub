@@ -6,9 +6,18 @@ import { eq, and } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import importRouter from './import.ts';
 
+import membersRouter from './members.ts';
+import expensesRouter from './expenses.ts';
+import balancesRouter from './balances.ts';
+import settlementsRouter from './settlements.ts';
+
 const router = Router();
 
 router.use('/:groupId/import', importRouter);
+router.use('/:groupId/members', membersRouter);
+router.use('/:groupId/expenses', expensesRouter);
+router.use('/:groupId/balances', balancesRouter);
+router.use('/:groupId/settlements', settlementsRouter);
 
 // GET /api/groups - List groups for current user
 router.get('/', requireAuth, async (req: AuthRequest, res) => {
