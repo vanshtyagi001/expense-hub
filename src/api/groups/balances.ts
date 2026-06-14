@@ -97,4 +97,55 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+router.get('/:userId/drilldown', requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { groupId, userId } = req.params;
+    
+    // Find expenses where user is payer or in splits
+    const userExpenses = await db.query.expenses.findMany({
+      where: eq(expenses.groupId, groupId),
+      with: {
+        splits: true,
+        paidBy: true
+      }
+    });
+
+    const drilldowns = userExpenses.map(exp => {
+      let impact = new Decimal(0);
+      let role = [];
+      const splits = (exp.splits as any[]) || [];
+      
+      const userSplit = splits.find(s => s.userId === userId);
+      const isPayer = exp.paidById === userId;
+
+      if (isPayer) {
+        impact = impact.plus(new Decimal(exp.amountInr));
+        role.push('Payer');
+      }
+      
+      if (userSplit) {
+        impact = impact.minus(new Decimal(userSplit.amount));
+        role.push('Participant');
+      }
+
+      if (impact.isZero() && !isPayer && !userSplit) return null;
+
+      return {
+        expenseId: exp.id,
+        description: exp.description,
+        date: exp.date,
+        totalAmount: exp.amountInr,
+        impact: impact.toNumber(),
+        role: role.join(' & '),
+        payerName: (exp.paidBy as any)?.name
+      };
+    }).filter(d => d !== null);
+
+    res.json(drilldowns);
+  } catch (error) {
+    console.error('Error fetching balance drilldown:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 export default router;

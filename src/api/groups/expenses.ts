@@ -34,11 +34,15 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
 router.post('/', requireAuth, async (req: AuthRequest, res) => {
     try {
         const { groupId } = req.params;
-        const { description, amount, currency, date, paidById, splitType, splits, notes } = req.body;
+        const { description, amount, currency, date, paidById, splitType, splits, notes, exchangeRate } = req.body;
 
         const expenseId = randomUUID();
         const amountNum = parseFloat(amount);
-        const amountInr = amountNum; // TODO: exchange rate logic here for USD
+        let rateNum = parseFloat(exchangeRate);
+        if (isNaN(rateNum) || rateNum <= 0) {
+            rateNum = currency === 'USD' ? 83.00 : 1.0;
+        }
+        const amountInr = currency === 'USD' ? amountNum * rateNum : amountNum;
 
         await db.insert(expenses).values({
             id: expenseId,
@@ -46,7 +50,7 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
             description,
             amount: amountNum.toString(),
             currency: currency || 'INR',
-            exchangeRate: currency === 'USD' ? '83.00' : null, // placeholder
+            exchangeRate: currency === 'USD' ? rateNum.toString() : null,
             amountInr: amountInr.toString(),
             date,
             paidById,

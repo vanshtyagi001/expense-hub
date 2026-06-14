@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardContent } from '../../components/ui/card';
-import { ArrowUpRight, ArrowDownRight, HandCoins } from 'lucide-react';
+import { HandCoins, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { format } from 'date-fns';
 
 export default function GroupBalances() {
   const { groupId } = useParams();
   const { token, currentUser } = useAuth();
   const [balances, setBalances] = useState<any>(null);
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [drilldownCache, setDrilldownCache] = useState<Record<string, any[]>>({});
 
   const fetchBalances = async () => {
     if (!token || !groupId) return;
@@ -23,6 +26,25 @@ export default function GroupBalances() {
   useEffect(() => {
      fetchBalances();
   }, [token, groupId]);
+
+  const toggleDrilldown = async (userId: string) => {
+    if (expandedUser === userId) {
+      setExpandedUser(null);
+      return;
+    }
+    setExpandedUser(userId);
+    if (!drilldownCache[userId]) {
+      try {
+        const res = await fetch(`/api/groups/${groupId}/balances/${userId}/drilldown`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDrilldownCache(prev => ({ ...prev, [userId]: data }));
+        }
+      } catch (err) {}
+    }
+  };
 
   const handleSettle = async (fromId: string, toId: string, amount: string) => {
      try {
@@ -47,24 +69,56 @@ export default function GroupBalances() {
     <div className="space-y-8 animate-in fade-in">
         <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100">
             <h2 className="text-2xl font-normal tracking-tight mb-6">Net Balances</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {balances?.memberBalances?.map((b: any) => (
-                    <Card key={b.userId} className="rounded-2xl border-0 shadow-sm bg-gray-50/50">
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-gray-400">
-                                   {b.name.charAt(0)}
-                                </div>
-                                <div className="font-medium">
-                                    {b.name}
-                                    {b.email === currentUser?.email && <span className="ml-2 text-xs text-gray-400 font-normal">(You)</span>}
-                                </div>
-                            </div>
-                            <div className={`font-medium ${b.netBalance > 0 ? 'text-[#00e013]' : b.netBalance < 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                                {b.netBalance > 0 ? '+' : b.netBalance < 0 ? '-' : ''}₹{Math.abs(b.netBalance).toFixed(2)}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div key={b.userId} className="flex flex-col">
+                      <Card className="rounded-2xl border-0 shadow-sm bg-gray-50/50 cursor-pointer hover:bg-gray-100/50 transition-colors" onClick={() => toggleDrilldown(b.userId)}>
+                          <CardContent className="p-4 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-gray-400">
+                                     {b.name.charAt(0)}
+                                  </div>
+                                  <div className="font-medium">
+                                      {b.name}
+                                      {b.email === currentUser?.email && <span className="ml-2 text-xs text-gray-400 font-normal">(You)</span>}
+                                  </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                  <div className={`font-medium ${b.netBalance > 0 ? 'text-[#00e013]' : b.netBalance < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                                      {b.netBalance > 0 ? '+' : b.netBalance < 0 ? '-' : ''}₹{Math.abs(b.netBalance).toFixed(2)}
+                                  </div>
+                                  <div className="text-gray-400">
+                                    {expandedUser === b.userId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                  </div>
+                              </div>
+                          </CardContent>
+                      </Card>
+                      
+                      {expandedUser === b.userId && (
+                        <div className="mt-2 pl-4 py-4 pr-4 bg-white border border-gray-100 rounded-xl max-h-[300px] overflow-auto">
+                          <h4 className="text-sm font-medium mb-3 text-gray-500">Balance Drill-down</h4>
+                          {(!drilldownCache[b.userId]) ? (
+                             <div className="text-sm text-gray-400">Loading...</div>
+                          ) : drilldownCache[b.userId]?.length === 0 ? (
+                             <div className="text-sm text-gray-400">No expenses recorded for this user.</div>
+                          ) : (
+                             <div className="space-y-3">
+                               {drilldownCache[b.userId]?.map(d => (
+                                 <div key={d.expenseId} className="flex justify-between items-start text-sm pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+                                   <div>
+                                     <div className="font-medium">{d.description}</div>
+                                     <div className="text-xs text-gray-500">{format(new Date(d.date), 'MMM d, yyyy')} • {d.role === 'Payer' ? `Paid ₹${parseFloat(d.totalAmount).toFixed(2)}` : `Paid by ${d.payerName}`}</div>
+                                   </div>
+                                   <div className={`font-medium ${d.impact > 0 ? 'text-[#00e013]' : d.impact < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                                     {d.impact > 0 ? '+' : d.impact < 0 ? '-' : ''}₹{Math.abs(d.impact).toFixed(2)}
+                                   </div>
+                                 </div>
+                               ))}
+                             </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                 ))}
             </div>
         </div>

@@ -4,24 +4,26 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Badge } from '../../components/ui/badge';
 import { format } from 'date-fns';
+import { AddExpenseDialog } from '../../components/AddExpenseDialog';
 
 export default function GroupExpenses() {
   const { groupId } = useParams();
   const { token } = useAuth();
   const [expenses, setExpenses] = useState<any[]>([]);
 
+  const fetchExp = async () => {
+      try {
+          const res = await fetch(`/api/groups/${groupId}/expenses`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+              const data = await res.json();
+              setExpenses(data.expenses);
+          }
+      } catch(err) {}
+  };
+
   useEffect(() => {
-      const fetchExp = async () => {
-          try {
-              const res = await fetch(`/api/groups/${groupId}/expenses`, {
-                  headers: { 'Authorization': `Bearer ${token}` }
-              });
-              if (res.ok) {
-                  const data = await res.json();
-                  setExpenses(data.expenses);
-              }
-          } catch(err) {}
-      };
       if (token && groupId) fetchExp();
   }, [token, groupId]);
 
@@ -29,7 +31,7 @@ export default function GroupExpenses() {
     <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 animate-in fade-in">
        <div className="flex justify-between items-center mb-6">
            <h2 className="text-2xl font-normal tracking-tight">Expenses</h2>
-           {/* Add Expense Button goes here */}
+           <AddExpenseDialog onExpenseAdded={fetchExp} />
        </div>
 
        <div className="border border-gray-100 rounded-2xl overflow-hidden">
@@ -47,7 +49,10 @@ export default function GroupExpenses() {
                    {expenses.map((exp: any) => (
                        <TableRow key={exp.id}>
                            <TableCell className="text-gray-500">{format(new Date(exp.date), 'MMM d, yyyy')}</TableCell>
-                           <TableCell className="font-medium">{exp.description}</TableCell>
+                           <TableCell className="font-medium">
+                               {exp.description}
+                               {exp.currency === 'USD' && <span className="ml-2 text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">USD ${parseFloat(exp.amount).toFixed(2)} @ {exp.exchangeRate}</span>}
+                           </TableCell>
                            <TableCell>{exp.paidBy?.name}</TableCell>
                            <TableCell>
                                <Badge variant="outline" className="capitalize text-xs font-normal bg-gray-50">
