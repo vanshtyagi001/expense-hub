@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { ArrowRight, Wallet, Users } from 'lucide-react';
+import { ArrowRight, Users, Plus, Upload, Wallet, Receipt } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
@@ -24,64 +23,77 @@ export default function Dashboard() {
   }, [token]);
   
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h1 className="text-4xl font-normal tracking-tight mb-2">Hello, {currentUser?.displayName || 'there'}</h1>
-        <p className="text-lg text-gray-500 max-w-2xl">
-          Welcome to ExpenseHub. Track expenses, manage changing group memberships, and settle balances transparently.
-        </p>
+    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* Mobile Hero Balance Card */}
+      <div className="w-full h-[220px] bg-[#00e013] rounded-[40px] p-6 text-black flex flex-col justify-between shadow-lg">
+        <div>
+          <h2 className="text-sm font-medium opacity-80 mb-1">Your Balance</h2>
+          <div className="text-4xl md:text-5xl font-semibold tracking-tight">₹0</div>
+        </div>
+        <div>
+          <div className="text-sm font-medium opacity-90">You owe ₹0</div>
+          <div className="text-sm font-medium opacity-90">You are owed ₹0</div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="rounded-[32px] border-0 shadow-sm bg-white overflow-hidden">
-          <CardHeader className="pb-2">
-            <div className="w-10 h-10 rounded-full bg-[#00e013]/10 flex items-center justify-center mb-4">
-              <Wallet className="text-[#00e013]" size={20} />
-            </div>
-            <CardTitle className="text-sm font-medium text-gray-500">Total Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-medium tracking-tight">Active Groups: {groups.length}</div>
-            <p className="text-xs text-gray-500 mt-1">Visit a group to see detailed balances</p>
-          </CardContent>
-        </Card>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Link to="/groups" className="bg-white border text-center border-gray-100 rounded-[28px] h-[90px] flex flex-col items-center justify-center gap-1 hover:shadow-md transition-shadow">
+           <Plus size={22} className="text-black" />
+           <span className="text-[13px] font-medium">Add Group</span>
+        </Link>
+        <div className="bg-white border text-center border-gray-100 rounded-[28px] h-[90px] flex flex-col items-center justify-center gap-1 hover:shadow-md transition-shadow opacity-60">
+           <Receipt size={22} className="text-black" />
+           <span className="text-[13px] font-medium">Add Expense</span>
+        </div>
+        <div className="bg-white border text-center border-gray-100 rounded-[28px] h-[90px] flex flex-col items-center justify-center gap-1 hover:shadow-md transition-shadow opacity-60">
+           <Wallet size={22} className="text-black" />
+           <span className="text-[13px] font-medium">Settle Up</span>
+        </div>
+        <Link to="/groups" className="bg-black text-white text-center rounded-[28px] h-[90px] flex flex-col items-center justify-center gap-1 hover:bg-black/90 transition-colors">
+           <Upload size={22} />
+           <span className="text-[13px] font-medium">Import CSV</span>
+        </Link>
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-medium tracking-tight">Your Groups</h2>
-          <Button render={<Link to="/groups" />} variant="outline" className="rounded-full" nativeButton={false}>
-            View All <ArrowRight className="ml-2 h-4 w-4" />
+          <h2 className="text-xl md:text-2xl font-medium tracking-tight">Your Groups</h2>
+          <Button render={<Link to="/groups" />} variant="ghost" className="rounded-full text-[#00e013] hover:text-black hover:bg-gray-100 px-3 h-8" nativeButton={false}>
+             See All
           </Button>
         </div>
         
+        {/* Groups List (Vertical layout on mobile) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link to="/groups">
-            <div className="p-6 rounded-[32px] border-2 border-dashed border-gray-200 hover:border-[#00e013] hover:bg-[#00e013]/5 transition-colors flex flex-col items-center justify-center text-center h-48 gap-4">
-              <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center">
-                +
-              </div>
-              <div className="font-medium">Create a new group</div>
+          {groups.length === 0 && (
+            <div className="p-6 md:col-span-2 lg:col-span-3 rounded-[32px] border-2 border-dashed border-gray-200 text-center h-48 flex flex-col items-center justify-center">
+              <span className="text-gray-500 mb-2">No groups yet.</span>
+              <Link to="/groups" className="text-[#00e013] font-medium">Create a new group</Link>
             </div>
-          </Link>
+          )}
           {groups.map(g => (
              <Link key={g.id} to={`/groups/${g.id}`}>
-               <Card className="p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-48 flex flex-col justify-between group cursor-pointer bg-white">
-                 <div>
-                   <div className="flex items-center gap-2 mb-2">
-                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                       <Users size={16} />
+               <div className="p-5 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group cursor-pointer bg-white">
+                 <div className="flex items-start justify-between mb-4">
+                   <div className="flex items-center gap-3 w-full">
+                     <div className="w-12 h-12 shrink-0 rounded-full bg-[#00e013]/20 flex items-center justify-center text-[#00e013]">
+                       <Users size={20} />
                      </div>
-                     <span className="font-medium">{g.name}</span>
+                     <div className="truncate w-full pr-4">
+                       <h3 className="font-semibold text-lg truncate tracking-tight">{g.name}</h3>
+                       <p className="text-sm text-gray-500 truncate">{g.description || 'No description'}</p>
+                     </div>
                    </div>
-                   <p className="text-sm text-gray-500 line-clamp-2">{g.description || 'No description provided.'}</p>
                  </div>
-                 <div className="flex justify-end">
-                    <div className="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-black group-hover:text-white flex items-center justify-center transition-colors">
-                      <ArrowRight size={16} />
+                 <div className="flex justify-between items-center px-1">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">0 Mem</span>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-black group-hover:text-white flex items-center justify-center transition-colors">
+                      <ArrowRight size={14} />
                     </div>
                  </div>
-               </Card>
+               </div>
              </Link>
           ))}
         </div>

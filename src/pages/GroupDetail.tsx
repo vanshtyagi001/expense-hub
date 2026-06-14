@@ -59,12 +59,12 @@ export default function GroupDetail() {
       </div>
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="bg-white rounded-full p-1 h-auto mb-8 shadow-sm">
-          <TabsTrigger value="overview" className="rounded-full px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Overview</TabsTrigger>
-          <TabsTrigger value="expenses" className="rounded-full px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Expenses</TabsTrigger>
-          <TabsTrigger value="balances" className="rounded-full px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Balances</TabsTrigger>
-          <TabsTrigger value="members" className="rounded-full px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Members</TabsTrigger>
-          <TabsTrigger value="import" className="rounded-full px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Import CSV</TabsTrigger>
+        <TabsList className="bg-white md:rounded-full rounded-2xl p-1 h-auto mb-6 md:mb-8 shadow-sm w-full md:w-fit flex justify-start md:justify-center overflow-x-auto snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <TabsTrigger value="overview" className="rounded-full shrink-0 px-5 md:px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Overview</TabsTrigger>
+          <TabsTrigger value="expenses" className="rounded-full shrink-0 px-5 md:px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Expenses</TabsTrigger>
+          <TabsTrigger value="balances" className="rounded-full shrink-0 px-5 md:px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Balances</TabsTrigger>
+          <TabsTrigger value="members" className="rounded-full shrink-0 px-5 md:px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Members</TabsTrigger>
+          <TabsTrigger value="import" className="rounded-full shrink-0 px-5 md:px-6 py-2.5 data-[state=active]:bg-black data-[state=active]:text-white">Import CSV</TabsTrigger>
         </TabsList>
         
         <div className="mt-4">

@@ -65,20 +65,15 @@ export default function Login() {
     try {
       setError('');
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          skipBrowserRedirect: true,
           redirectTo: `${window.location.origin}/auth/callback`
         }
       });
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, 'oauth_popup', 'width=600,height=700');
-      }
     } catch (err: any) {
       setError(err.message || 'Failed to initialize Google login');
-    } finally {
       setLoading(false);
     }
   };

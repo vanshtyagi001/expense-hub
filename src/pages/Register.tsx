@@ -11,6 +11,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -47,6 +48,7 @@ export default function Register() {
     e.preventDefault();
     try {
       setError('');
+      setSuccessMsg('');
       setLoading(true);
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -59,9 +61,17 @@ export default function Register() {
       });
       if (signUpError) throw signUpError;
       
-      navigate('/');
+      if (data.user && !data.session) {
+        setSuccessMsg('A confirmation email has been sent. Please check your inbox.');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to create an account');
+      if (err.message?.toLowerCase().includes('rate limit')) {
+        setError('Too many signup attempts. Please wait a while or use Google Sign in instead. (Developers: adjust this in your Supabase Dashboard -> Auth -> Rate Limits)');
+      } else {
+        setError(err.message || 'Failed to create an account');
+      }
     } finally {
       setLoading(false);
     }
@@ -71,20 +81,15 @@ export default function Register() {
     try {
       setError('');
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          skipBrowserRedirect: true,
           redirectTo: `${window.location.origin}/auth/callback`
         }
       });
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, 'oauth_popup', 'width=600,height=700');
-      }
     } catch (err: any) {
       setError(err.message || 'Failed to initialize Google registration');
-    } finally {
       setLoading(false);
     }
   };
@@ -131,6 +136,11 @@ export default function Register() {
             {error && (
               <div className="p-3 bg-red-100 text-red-600 rounded-xl text-sm">
                 {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="p-3 bg-[#00e013]/20 text-green-800 rounded-xl text-sm border border-[#00e013]/30">
+                {successMsg}
               </div>
             )}
             <div className="space-y-2">
