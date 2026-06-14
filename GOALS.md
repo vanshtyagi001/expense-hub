@@ -8,23 +8,23 @@ Build a production-quality shared expense management platform that transforms me
 
 # Goal 1: Foundation & Architecture
 Objective: Establish a maintainable, scalable, and well-structured application architecture.
-Status: In Progress
+Status: Completed
 
 # Goal 2: User Authentication
 Objective: Allow users to securely access and manage their expense data.
-Status: In Progress
+Status: Completed
 
 # Goal 3: Group Management
 Objective: Allow users to create and manage expense-sharing groups.
-Status: In Progress
+Status: Completed
 
 # Goal 4: Dynamic Membership Timeline
 Objective: Correctly handle users joining and leaving groups over time.
-Status: In Progress (Basic schema + UI)
+Status: Completed
 
 # Goal 5: Expense Management
 Objective: Provide complete expense creation and tracking capabilities.
-Status: In Progress (Basic CRUD + Equal Split)
+Status: Completed
 
 # Goal 6: Expense Splitting Engine
 Objective: Support all expense splitting methods required by the assignment.
