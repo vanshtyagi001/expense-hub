@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 
 export default function Register() {
@@ -95,9 +96,20 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#00e013] p-4 text-black font-sans">
-      <Card className="w-full max-w-md border-0 shadow-2xl rounded-[32px] overflow-hidden bg-white">
-        <CardHeader className="space-y-1 pb-8 pt-10 text-center">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 text-black font-sans relative overflow-hidden bg-gradient-to-br from-[#00e013] via-[#00c010] to-[#00900a]">
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-10 md:opacity-[0.15] z-0" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+          mixBlendMode: 'overlay'
+        }}
+      ></div>
+      <div className="absolute top-[-20%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#a8ffad] blur-[120px] rounded-full pointer-events-none opacity-50 z-0"></div>
+
+
+      <Card className="w-full max-w-md border-0 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-2xl md:rounded-[32px] overflow-hidden bg-white relative z-10">
+        <CardHeader className="space-y-1 pb-6 md:pb-8 pt-8 md:pt-10 text-center">
           <div className="mx-auto w-16 h-16 flex items-center justify-center mb-4">
              <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-2xl shadow-sm" />
           </div>
@@ -179,7 +191,7 @@ export default function Register() {
             </div>
             <Button 
               type="submit" 
-              className="w-full rounded-full h-14 text-lg bg-black text-white hover:bg-black/90 transition-all font-medium mt-4" 
+              className="w-full rounded-full h-12 md:h-14 text-base md:text-lg bg-black text-white hover:bg-black/90 transition-all font-medium mt-4" 
               disabled={loading}
             >
               {loading ? 'Creating...' : 'Sign Up'}
@@ -193,6 +205,9 @@ export default function Register() {
               Sign in
             </Link>
           </div>
+          <Link to="/" className="text-sm text-black/60 font-medium hover:text-black flex items-center justify-center gap-2 mt-4 transition-colors">
+            <ArrowLeft size={16} /> Back to home
+          </Link>
         </CardFooter>
       </Card>
     </div>

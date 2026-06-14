@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { ArrowRight, Users, Plus, Upload, Wallet, Receipt } from 'lucide-react';
+import { ArrowRight, Users, Plus, Upload, Wallet, Receipt, Activity, PieChart as PieChartIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function Dashboard() {
   const { currentUser, token } = useAuth();
   const [groups, setGroups] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
 
   useEffect(() => {
     if (token) {
@@ -17,6 +19,15 @@ export default function Dashboard() {
         .then(data => {
             if (Array.isArray(data)) setGroups(data);
             else if (data.groups) setGroups(data.groups);
+        })
+        .catch(console.error);
+
+        fetch('/api/user/analytics', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.error) setAnalytics(data);
         })
         .catch(console.error);
     }
@@ -55,6 +66,78 @@ export default function Dashboard() {
            <Upload size={22} />
            <span className="text-[13px] font-medium">Import CSV</span>
         </Link>
+      </div>
+
+      {/* Interactive Analytics Dashboard */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+           <Activity className="text-black" size={24} />
+           <h2 className="text-xl md:text-2xl font-medium tracking-tight">Analytics Dashboard</h2>
+        </div>
+        
+        {(!analytics || !analytics.hasData) ? (
+          <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm text-center flex flex-col items-center justify-center min-h-[300px]">
+            <PieChartIcon size={48} className="text-gray-200 mb-4" />
+            <h3 className="text-lg font-medium text-black mb-2">No data to analyze</h3>
+            <p className="text-sm text-gray-500 max-w-sm">
+              Add some expenses to your groups to see your spending broken down by category and week.
+            </p>
+          </div>
+        ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Weekly Spending Bar Chart */}
+          <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
+            <h3 className="text-lg font-semibold tracking-tight mb-6">Weekly Spending</h3>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics?.weekly || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
+                  <Tooltip 
+                    cursor={{ fill: '#f3f4f6' }} 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontWeight: 500 }}
+                    itemStyle={{ color: '#000' }}
+                  />
+                  <Bar dataKey="spend" fill="#00e013" radius={[6, 6, 6, 6]} barSize={32} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Categories Pie Chart */}
+          <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-2 mb-6">
+               <PieChartIcon size={20} className="text-gray-500" />
+               <h3 className="text-lg font-semibold tracking-tight">Category Breakdown</h3>
+            </div>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analytics?.categories || []}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {(analytics?.categories || []).map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontWeight: 500 }}
+                    itemStyle={{ color: '#000' }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '10px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+        )}
       </div>
 
       <div className="space-y-4">

@@ -28,7 +28,6 @@ export const requireAuth = async (
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
-      console.error('Error verifying Supabase token:', error);
       res.status(401).json({ error: 'Unauthorized: Invalid token' });
       return;
     }
@@ -40,7 +39,6 @@ export const requireAuth = async (
     };
     next();
   } catch (error) {
-    console.error('Error verifying token:', error);
     res.status(401).json({ error: 'Unauthorized: Invalid token' });
     return;
   }

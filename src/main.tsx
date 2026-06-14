@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AuthCallback from './pages/AuthCallback';
+import Profile from './pages/Profile';
 
 import GroupList from './pages/GroupList';
 import GroupDetail from './pages/GroupDetail';
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/groups" element={<GroupList />} />
             <Route path="/groups/:groupId/*" element={<GroupDetail />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

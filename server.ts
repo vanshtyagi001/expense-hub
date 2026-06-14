@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { requireAuth } from './src/middleware/auth.ts';
 import groupsRouter from './src/api/groups/index.ts';
+import userRouter from './src/api/user/index.ts';
 
 async function startServer() {
   const app = express();
@@ -16,6 +17,7 @@ async function startServer() {
   });
 
   app.use("/api/groups", groupsRouter);
+  app.use("/api/user", userRouter);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

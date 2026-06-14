@@ -16,7 +16,7 @@ export function AppLayout() {
   return (
     <div className="min-h-screen bg-[#f7f7f7] flex flex-col md:flex-row font-sans pb-[72px] md:pb-0">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-full md:w-64 bg-black text-white p-6 md:flex flex-col md:min-h-screen shrink-0">
+      <aside className="hidden w-full md:w-64 bg-black text-white p-6 md:flex flex-col h-screen sticky top-0 shrink-0">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-8 h-8 flex items-center justify-center">
             <img src="/logo.png" alt="ExpenseHub" className="w-full h-full object-contain rounded-md" />
@@ -32,6 +32,10 @@ export function AppLayout() {
           <Link to="/groups" className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive('/groups') ? 'bg-white/20 opacity-100' : 'hover:bg-white/10 opacity-80 hover:opacity-100'}`}>
             <Users size={20} />
             <span>Groups</span>
+          </Link>
+          <Link to="/profile" className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive('/profile') ? 'bg-white/20 opacity-100' : 'hover:bg-white/10 opacity-80 hover:opacity-100'}`}>
+            <UserIcon size={20} />
+            <span>Profile</span>
           </Link>
         </nav>
 
@@ -76,14 +80,14 @@ export function AppLayout() {
           <span className={`text-[11px] font-medium ${isActive('/groups') ? 'text-black' : 'text-gray-400'}`}>Groups</span>
         </Link>
         {/* Placeholder for Expenses/Balances */}
-        <Link to="/groups" className="flex flex-col items-center justify-center w-full h-full gap-1 opacity-50">
+        <Link to="/groups" className="flex flex-col items-center justify-center w-full h-full gap-1 opacity-50 pointer-events-none">
           <Receipt size={22} className="text-gray-400" />
           <span className="text-[11px] font-medium text-gray-400">Expenses</span>
         </Link>
-        <div className="flex flex-col items-center justify-center w-full h-full gap-1 opacity-50">
-          <UserIcon size={22} className="text-gray-400" />
-          <span className="text-[11px] font-medium text-gray-400">Profile</span>
-        </div>
+        <Link to="/profile" className="flex flex-col items-center justify-center w-full h-full gap-1">
+          <UserIcon size={22} className={isActive('/profile') ? 'text-black' : 'text-gray-400'} />
+          <span className={`text-[11px] font-medium ${isActive('/profile') ? 'text-black' : 'text-gray-400'}`}>Profile</span>
+        </Link>
       </nav>
     </div>
   );
