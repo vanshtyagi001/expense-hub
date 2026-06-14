@@ -18,6 +18,8 @@ export function AddExpenseDialog({ onExpenseAdded }: { onExpenseAdded: () => voi
   const [exchangeRate, setExchangeRate] = useState('83.00');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
+  const [splitType, setSplitType] = useState('equal');
+  const [splitValues, setSplitValues] = useState<Record<string, string>>({});
   
   const [members, setMembers] = useState<any[]>([]);
 
@@ -65,12 +67,46 @@ export function AddExpenseDialog({ onExpenseAdded }: { onExpenseAdded: () => voi
         amountInr = amountNum * parseFloat(exchangeRate || '83.00');
     }
     
-    const splitAmount = amountInr / activeMembers.length;
-    
-    const splits = activeMembers.map(m => ({
-        userId: m.userId,
-        amount: splitAmount
-    }));
+    let splits: any[] = [];
+    if (splitType === 'equal') {
+        const splitAmount = amountInr / activeMembers.length;
+        splits = activeMembers.map(m => ({
+            userId: m.userId,
+            amount: splitAmount
+        }));
+    } else if (splitType === 'unequal') {
+        let currentTotal = 0;
+        splits = activeMembers.map(m => {
+            const val = parseFloat(splitValues[m.userId] || '0');
+            currentTotal += val;
+            return { userId: m.userId, Math_val: val };
+        });
+        
+        // Scale values to the local currency amount if entered in original currency
+        if (Math.abs(currentTotal - amountNum) > 0.05 && currency === 'USD') {
+             // they might have entered exact amounts in USD, scale it to INR
+             // actually let them enter exact amounts in the native currency. We'll convert.
+             let scale = amountInr / currentTotal;
+             splits = splits.map(s => ({ userId: s.userId, amount: s.Math_val * scale }));
+        } else {
+             // assumed they entered in INR directly or matched perfectly
+             let scale = amountInr / currentTotal;
+             splits = splits.map(s => ({ userId: s.userId, amount: s.Math_val * scale }));
+        }
+    } else if (splitType === 'percentage') {
+        splits = activeMembers.map(m => {
+            const val = parseFloat(splitValues[m.userId] || '0');
+            return { userId: m.userId, amount: amountInr * (val / 100), percentage: val };
+        });
+    } else if (splitType === 'share') {
+        let totalShares = 0;
+        const mapped = activeMembers.map(m => {
+            const val = parseFloat(splitValues[m.userId] || '1'); // Default to 1 share
+            totalShares += val;
+            return { userId: m.userId, val };
+        });
+        splits = mapped.map(s => ({ userId: s.userId, amount: amountInr * (s.val / totalShares), shares: s.val }));
+    }
 
     try {
         const res = await fetch(`/api/groups/${groupId}/expenses`, {
@@ -86,7 +122,7 @@ export function AddExpenseDialog({ onExpenseAdded }: { onExpenseAdded: () => voi
                 exchangeRate,
                 date: new Date(date).toISOString(),
                 paidById: payer.userId,
-                splitType: 'equal',
+                splitType: splitType,
                 splits,
                 notes: ''
             })
@@ -175,6 +211,44 @@ export function AddExpenseDialog({ onExpenseAdded }: { onExpenseAdded: () => voi
               className="rounded-2xl h-12"
               required 
             />
+          </div>
+
+          <div className="space-y-4 pt-2 border-t border-gray-100">
+            <Label className="block">Split Method</Label>
+            <div className="grid grid-cols-4 gap-2">
+                {['equal', 'unequal', 'percentage', 'share'].map(type => (
+                    <Button 
+                        key={type}
+                        type="button" 
+                        variant={splitType === type ? 'default' : 'outline'}
+                        onClick={() => setSplitType(type)}
+                        className={`h-10 capitalize ${splitType === type ? 'bg-black text-white hover:bg-black/90' : 'border-gray-200 text-gray-600'}`}
+                    >
+                        {type}
+                    </Button>
+                ))}
+            </div>
+
+            {splitType !== 'equal' && members.length > 0 && (
+                <div className="space-y-3 bg-gray-50/50 p-4 rounded-2xl border border-gray-100 max-h-48 overflow-y-auto">
+                    {members.filter(m => new Date(m.joinedAt) <= new Date(date)).map(m => (
+                        <div key={m.userId} className="flex justify-between items-center">
+                            <span className="text-sm font-medium">{m.user.name}</span>
+                            <div className="flex items-center gap-2">
+                                <Input 
+                                    type="number"
+                                    step="0.01"
+                                    value={splitValues[m.userId] || ''}
+                                    onChange={e => setSplitValues({...splitValues, [m.userId]: e.target.value})}
+                                    placeholder={splitType === 'percentage' ? '0%' : splitType === 'share' ? '0' : '0.00'}
+                                    className="w-24 h-9 rounded-xl text-right"
+                                />
+                                {splitType === 'percentage' && <span className="text-sm text-gray-500">%</span>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
           </div>
 
           <Button 

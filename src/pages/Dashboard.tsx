@@ -36,7 +36,7 @@ export default function Dashboard() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-medium tracking-tight">Your Groups</h2>
-          <Button render={<Link to="/groups" />} variant="outline" className="rounded-full">
+          <Button render={<Link to="/groups" />} variant="outline" className="rounded-full" nativeButton={false}>
             View All <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

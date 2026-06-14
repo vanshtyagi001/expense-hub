@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
 export const RawExpenseRowSchema = z.object({
-  date: z.string().min(1, 'Date is required'),
-  description: z.string().min(1, 'Description is required'),
-  amount: z.string().min(1, 'Amount is required'),
+  date: z.string().optional().default(''),
+  description: z.string().optional().default(''),
+  amount: z.string().optional().default('0'),
   currency: z.string().optional().default('INR'),
-  paid_by: z.string().min(1, 'Paid by is required'),
-  split_type: z.enum(['equal', 'exact', 'percentage', 'share', 'shares', 'unequal']).default('equal'),
-  split_with: z.string().optional(),
-  split_details: z.string().optional(),
-  notes: z.string().optional()
+  paid_by: z.string().optional().default(''),
+  split_type: z.string().optional().default('equal'),
+  split_with: z.string().optional().default(''),
+  split_details: z.string().optional().default(''),
+  notes: z.string().optional().default('')
 });
 
 export type ValidatedRow = z.infer<typeof RawExpenseRowSchema>;

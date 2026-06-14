@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../../components/ui/badge';
 import { format } from 'date-fns';
 import { AddExpenseDialog } from '../../components/AddExpenseDialog';
+import { Button } from '../../components/ui/button';
 
 export default function GroupExpenses() {
   const { groupId } = useParams();
@@ -27,11 +28,44 @@ export default function GroupExpenses() {
       if (token && groupId) fetchExp();
   }, [token, groupId]);
 
+  const handleExport = () => {
+     const csvRows = [];
+     const headers = ['Date', 'Description', 'Payer', 'Total Amount', 'Currency', 'Exchange Rate', 'Split Type'];
+     csvRows.push(headers.join(','));
+     
+     for (const exp of expenses) {
+         const row = [
+             format(new Date(exp.date), 'yyyy-MM-dd'),
+             `"${exp.description}"`,
+             `"${exp.paidBy?.name}"`,
+             exp.amount,
+             exp.currency,
+             exp.exchangeRate || '1',
+             exp.splitType
+         ];
+         csvRows.push(row.join(','));
+     }
+
+     const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+     const url = URL.createObjectURL(blob);
+     const a = document.createElement('a');
+     a.href = url;
+     a.download = `group_expenses_${groupId}.csv`;
+     document.body.appendChild(a);
+     a.click();
+     document.body.removeChild(a);
+  };
+
   return (
     <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 animate-in fade-in">
        <div className="flex justify-between items-center mb-6">
            <h2 className="text-2xl font-normal tracking-tight">Expenses</h2>
-           <AddExpenseDialog onExpenseAdded={fetchExp} />
+           <div className="flex items-center gap-3">
+             <Button variant="outline" onClick={handleExport} className="rounded-full">
+               Export CSV
+             </Button>
+             <AddExpenseDialog onExpenseAdded={fetchExp} />
+           </div>
        </div>
 
        <div className="border border-gray-100 rounded-2xl overflow-hidden">

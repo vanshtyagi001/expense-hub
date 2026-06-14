@@ -48,11 +48,75 @@ const checkFutureDated: AnomalyCheck = (row, idx, rows, context) => {
   return null;
 };
 
+const checkDateFormatError: AnomalyCheck = (row) => {
+  if (!row.date || !row.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    return {
+      anomalyType: 'INVALID_DATE_FORMAT',
+      severity: 'ERROR',
+      description: `Unrecognized date format: ${row.date}`,
+    };
+  }
+  return null;
+};
+
+const checkMissingSummaryData: AnomalyCheck = (row) => {
+    if (!row.amount || parseFloat(row.amount) === 0 || isNaN(parseFloat(row.amount))) {
+         return {
+             anomalyType: 'MISSING_AMOUNT',
+             severity: 'ERROR',
+             description: 'Amount is 0 or missing.'
+         };
+    }
+    if (!row.paid_by || row.paid_by.trim() === '') {
+         return {
+             anomalyType: 'MISSING_PAYER',
+             severity: 'ERROR',
+             description: 'Missing payer information.'
+         };
+    }
+    return null;
+};
+
+const checkSettlementMisclassification: AnomalyCheck = (row) => {
+    const desc = row.description?.toLowerCase() || '';
+    if (desc.includes('paid back') || desc.includes('settlement') || desc.includes('deposit')) {
+        return {
+            anomalyType: 'SETTLEMENT_MISCLASSIFICATION',
+            severity: 'WARNING',
+            description: 'This looks like a settlement or deposit rather than a shared expense.',
+            suggestedFix: { isSettlement: true }
+        };
+    }
+    return null;
+};
+
+const checkDuplicates: AnomalyCheck = (row, idx, allRows) => {
+    const isDupe = allRows.findIndex((r, i) => 
+        i !== idx &&
+        r.date === row.date && 
+        Math.abs(parseFloat(r.amount) - parseFloat(row.amount)) < 0.01 &&
+        r.description.toLowerCase().trim() === row.description.toLowerCase().trim()
+    ) !== -1;
+
+    if (isDupe) {
+        return {
+            anomalyType: 'DUPLICATE_EXPENSE',
+            severity: 'WARNING',
+            description: 'This expense appears to be a duplicate of another entry.',
+            suggestedFix: { action: 'DISCARD' }
+        };
+    }
+    return null;
+};
+
 export const checks: AnomalyCheck[] = [
   checkNegativeAmount,
   checkAmountWithSymbol,
   checkFutureDated,
-  // More checks here...
+  checkDateFormatError,
+  checkMissingSummaryData,
+  checkSettlementMisclassification,
+  checkDuplicates
 ];
 
 export function detectAnomalies(rows: ValidatedRow[], context: ImportContext): ImportAnomaly[][] {
