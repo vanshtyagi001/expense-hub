@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express from "express";
 import groupsRouter from '../src/api/groups/index.ts';
 import userRouter from '../src/api/user/index.ts';
