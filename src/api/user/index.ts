@@ -47,7 +47,7 @@ router.get('/analytics', requireAuth, async (req: AuthRequest, res: any) => {
          const amount = parseFloat(userSplit.amount);
          
          // Aggregate categories
-         const cat = exp.categoryId || 'Other';
+         const cat = (exp as any).categoryId || 'Other';
          categoryMap[cat] = (categoryMap[cat] || 0) + amount;
 
          // Aggregate weekly (simplified: just map day of week)
