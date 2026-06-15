@@ -1,8 +1,6 @@
 // Vercel Serverless Function Handler
-// This file must use extensionless imports since Vercel's @vercel/node
-// runtime doesn't support .ts extensions in import specifiers.
+// Uses extensionless imports for Vercel's @vercel/node runtime compatibility.
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { createClient } from '@supabase/supabase-js';
@@ -26,7 +24,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_A
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- Auth Helper ---
-async function getAuthUser(req: VercelRequest): Promise<any | null> {
+async function getAuthUser(req: any): Promise<any | null> {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
   const token = authHeader.split('Bearer ')[1];
@@ -56,7 +54,7 @@ async function ensureDbUser(authUser: any) {
 }
 
 // --- Main Handler ---
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
