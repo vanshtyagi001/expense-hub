@@ -1,14 +1,16 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import * as dotenv from 'dotenv';
 import * as schema from './schema.ts';
+
+// Load .env BEFORE creating the pool, since ES module imports
+// are hoisted and run before other code in the importing file.
+dotenv.config();
 
 // Function to create a new connection pool.
 export const createPool = () => {
   return new Pool({
-    host: process.env.SQL_HOST,
-    user: process.env.SQL_USER,
-    password: process.env.SQL_PASSWORD,
-    database: process.env.SQL_DB_NAME,
+    connectionString: process.env.DATABASE_URL,
     connectionTimeoutMillis: 15000,
   });
 };

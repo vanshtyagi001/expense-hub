@@ -1,5 +1,7 @@
 import express from "express";
 import path from "path";
+import * as dotenv from "dotenv";
+dotenv.config();
 import { createServer as createViteServer } from "vite";
 import { requireAuth } from './src/middleware/auth.ts';
 import groupsRouter from './src/api/groups/index.ts';

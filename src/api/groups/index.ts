@@ -55,7 +55,18 @@ router.get('/', requireAuth, async (req: AuthRequest, res) => {
 router.post('/', requireAuth, async (req: AuthRequest, res) => {
   try {
     const uid = req.user!.uid;
-    const dbUser = await db.query.users.findFirst({ where: eq(users.uid, uid) });
+    let dbUser = await db.query.users.findFirst({ where: eq(users.uid, uid) });
+    if (!dbUser) {
+      // create user just in time if not exists
+      const id = randomUUID();
+      await db.insert(users).values({
+        id,
+        uid,
+        email: req.user!.email || '',
+        name: req.user!.name || req.user!.email?.split('@')[0] || 'Unknown',
+      });
+      dbUser = await db.query.users.findFirst({ where: eq(users.uid, uid) });
+    }
     const { name, description } = req.body;
     
     if (!name) return res.status(400).json({ error: 'Name is required' });
