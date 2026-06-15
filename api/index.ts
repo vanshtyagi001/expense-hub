@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 import { createClient } from '@supabase/supabase-js';
 import { eq, and, inArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
-import * as schema from './schema';
+import * as schema from './schema.js';
 
 // --- Database Setup ---
 const pool = new Pool({
