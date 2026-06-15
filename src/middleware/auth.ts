@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Reusing VITE_SUPABASE variables works on the server too if they are exposed in process.env, 
-// but often we need to explicitly load them. For now, since they are NEXT_PUBLIC variables in the 
-// user's prompt, we'll try to pick them up from process.env or fallback (in case it's set in shell).
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://sazuncuyunuusfvnhekl.supabase.co';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_vE4ODP1xkOhf5ALFWW2ySw_dZJ92pPL';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Lazy-initialize the Supabase client at first use, not at import time.
+// On Vercel, env vars may not be available when the module is first imported.
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://sazuncuyunuusfvnhekl.supabase.co';
+    const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 export interface AuthRequest extends Request {
   user?: any;
@@ -26,7 +30,7 @@ export const requireAuth = async (
 
   const token = authHeader.split('Bearer ')[1];
   try {
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const { data: { user }, error } = await getSupabase().auth.getUser(token);
     if (error || !user) {
       res.status(401).json({ error: 'Unauthorized: Invalid token' });
       return;
